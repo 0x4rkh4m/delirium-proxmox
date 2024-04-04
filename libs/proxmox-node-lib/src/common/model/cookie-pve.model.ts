@@ -15,6 +15,10 @@ export class CookiesPVE {
     return this.cookies;
   }
 
+  async getCookiesAsString(connectionUri: string): Promise<string> {
+    return await this.cookies.getCookieString(connectionUri);
+  }
+
   getTicket(): string {
     return this.ticket;
   }

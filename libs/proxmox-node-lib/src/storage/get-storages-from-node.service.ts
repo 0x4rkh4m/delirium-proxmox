@@ -3,22 +3,22 @@ import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
 import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
-import { NetworkResponse } from '@delirium/proxmox-node-lib/network/dto/network-response.dto';
-import { NetworksResponse } from '@delirium/proxmox-node-lib/network/dto/networks-response.dto';
+import { StoragesResponse } from '@delirium/proxmox-node-lib/storage/dto/storages-response.dto';
+import { StorageResponse } from '@delirium/proxmox-node-lib/storage/dto/storage-response.dto';
 
 @Injectable()
-export class GetNetworksFromNodeService {
+export class GetStoragesFromNodeService {
   constructor(
     private httpService: HttpService,
     private connection: Connection,
     private cookiesPVE: CookiesPVE,
   ) {}
 
-  async getNetworks(node: string): Promise<NetworksResponse | null> {
+  async getStorages(node: string): Promise<StoragesResponse | null> {
     try {
       const result = await firstValueFrom(
         this.httpService.get(
-          `${this.connection.getUri()}/nodes/${node}/network`,
+          `${this.connection.getUri()}/nodes/${node}/storage`,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -32,12 +32,12 @@ export class GetNetworksFromNodeService {
       );
 
       if (!result.data.length) {
-        throw new HttpException('Networks Not Found', 404);
+        throw new HttpException('Storages Not Found', 404);
       }
 
-      const networks = result.data.map(this.toResponse);
+      const storages = result.data.map(this.toResponse);
 
-      return new NetworksResponse(networks);
+      return new StoragesResponse(storages);
     } catch (error) {
       if (error.response.status === 401) {
         throw new HttpException('Unauthorized', 401);
@@ -50,23 +50,18 @@ export class GetNetworksFromNodeService {
     return null;
   }
 
-  private toResponse(result: any): NetworkResponse {
-    return new NetworkResponse(
-      result['method'] || null,
-      result['bridge_fd'] || '',
+  private toResponse(result: any): StorageResponse {
+    return new StorageResponse(
+      result['type'] || '',
+      result['used'] || 0,
+      result['avail'] || 0,
+      result['total'] || 0,
+      result['enabled'] === 1,
+      result['storage'] || '',
+      result['used_fraction'] || 0.0,
+      result['content'] ? result['content'].split(',') : [],
       result['active'] === 1,
-      result['iface'] || null,
-      result['priority'] || null,
-      result['type'] || null,
-      result['autostart'] === 1,
-      result['method6'] || '',
-      result['bridge_stp'] || '',
-      result['netmask'] || '',
-      result['cidr'] || '',
-      result['bridge_ports'] || '',
-      result['gateway'] || '',
-      result['families'] || [],
-      result['address'] || '',
+      result['shared'] === 1,
     );
   }
 }

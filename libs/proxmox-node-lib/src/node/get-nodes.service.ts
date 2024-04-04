@@ -21,7 +21,9 @@ export class GetNodesService {
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
-            Cookie: this.cookiesPVE.getCookies(),
+            Cookie: await this.cookiesPVE.getCookiesAsString(
+              this.connection.getUri(),
+            ),
           },
         }),
       );
