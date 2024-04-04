@@ -1,0 +1,17 @@
+{
+  "moduleFileExtensions": [
+    "js",
+    "json",
+    "ts"
+  ],
+  "rootDir": ".",
+  "testEnvironment": "node",
+  "testRegex": ".e2e-spec.ts$",
+  "transform": {
+    "^.+\\.(t|j)s$": "ts-jest"
+  },
+  "moduleNameMapper": {
+    "@delirium/proxmox-node-lib/(.*)": "<rootDir>/../libs/proxmox-node-lib/src/$1",
+    "@delirium/proxmox-node-lib": "<rootDir>/../libs/proxmox-node-lib/src"
+  }
+}
