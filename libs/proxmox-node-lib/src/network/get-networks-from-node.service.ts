@@ -5,6 +5,8 @@ import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.m
 import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
 import { NetworkResponse } from '@delirium/proxmox-node-lib/network/dto/network-response.dto';
 import { NetworksResponse } from '@delirium/proxmox-node-lib/network/dto/networks-response.dto';
+import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
+import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
 
 @Injectable()
 export class GetNetworksFromNodeService {
@@ -40,10 +42,10 @@ export class GetNetworksFromNodeService {
       return new NetworksResponse(networks);
     } catch (error) {
       if (error.response.status === 401) {
-        throw new HttpException('Unauthorized', 401);
+        throw new AuthFailedException();
       }
       if (error.response.status === 0) {
-        throw new HttpException('Host Unreachable', 500);
+        throw new HostUnreachableException();
       }
     }
 

@@ -1,25 +1,22 @@
-import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
 import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
-import { NodesResponse } from '@delirium/proxmox-node-lib/node/dto/nodes-response.dto';
-import { NodeResponse } from '@delirium/proxmox-node-lib/node/dto/node-response.dto';
+import { VersionResponse } from '@delirium/proxmox-node-lib/version/dto/version-response.dto';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
 
-@Injectable()
-export class GetNodesService {
+export class GetVersionFromNodeService {
   constructor(
     private httpService: HttpService,
     private connection: Connection,
     private cookiesPVE: CookiesPVE,
   ) {}
 
-  async getNodes(): Promise<NodesResponse | null> {
+  async getVersion(): Promise<VersionResponse | null> {
     try {
       const result = await firstValueFrom(
-        this.httpService.get(`${this.connection.getUri()}/nodes`, {
+        this.httpService.get(`${this.connection.getUri()}/version`, {
           headers: {
             'Content-Type': 'application/json',
             Accept: 'application/json',
@@ -30,9 +27,11 @@ export class GetNodesService {
         }),
       );
 
-      const nodes = result.data.map(this.toResponse);
+      if (!result.data) {
+        throw new Error('Version Not Found');
+      }
 
-      return new NodesResponse(nodes);
+      return this.toResponse(result.data);
     } catch (error) {
       if (error.response.status === 401) {
         throw new AuthFailedException();
@@ -45,21 +44,11 @@ export class GetNodesService {
     return null;
   }
 
-  private toResponse(result: any): NodeResponse {
-    return new NodeResponse(
-      result['status'],
-      result['level'],
-      result['id'],
-      result['ssl_fingerprint'],
-      result['maxmem'],
-      result['disk'],
-      result['uptime'],
-      result['mem'],
-      result['node'],
-      result['cpu'],
-      result['maxcpu'],
-      result['type'],
-      result['maxdisk'],
+  private toResponse(result: any): VersionResponse {
+    return new VersionResponse(
+      result['release'] || '',
+      result['repoid'] || '',
+      result['version'] || '',
     );
   }
 }

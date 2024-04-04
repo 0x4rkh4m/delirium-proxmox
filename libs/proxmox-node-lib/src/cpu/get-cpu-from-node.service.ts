@@ -4,6 +4,8 @@ import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.m
 import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
 import { CpusResponse } from '@delirium/proxmox-node-lib/cpu/dto/cpus-response.dto';
 import { CpuResponse } from '@delirium/proxmox-node-lib/cpu/dto/cpu-response.dto';
+import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
+import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
 
 export class GetCpuFromNodeService {
   constructor(
@@ -38,10 +40,10 @@ export class GetCpuFromNodeService {
       return new CpusResponse(cpus);
     } catch (error) {
       if (error.response.status === 401) {
-        throw new Error('Unauthorized');
+        throw new AuthFailedException();
       }
       if (error.response.status === 0) {
-        throw new Error('Host Unreachable');
+        throw new HostUnreachableException();
       }
     }
 

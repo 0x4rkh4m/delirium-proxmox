@@ -1,26 +1,37 @@
-import { Injectable, HttpException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
 import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
-import { StoragesResponse } from '@delirium/proxmox-node-lib/storage/dto/storages-response.dto';
-import { StorageResponse } from '@delirium/proxmox-node-lib/storage/dto/storage-response.dto';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
 
-@Injectable()
-export class GetStoragesFromNodeService {
+export class ConfigVMinNodeService {
   constructor(
     private httpService: HttpService,
     private connection: Connection,
     private cookiesPVE: CookiesPVE,
   ) {}
 
-  async getStorages(node: string): Promise<StoragesResponse | null> {
+  async configVM(
+    node: string,
+    vmid: number,
+    index?: number,
+    discard?: string,
+    cache?: string,
+    importFrom?: string,
+  ): Promise<string | null> {
     try {
+      const body = {
+        [`scsi${index}`]: `discard=${discard}`,
+        [`scsi${index}`]: `file=local-lvm:vm-102-disk-0,size=32`,
+        [`scsi${index}`]: `cache=${cache}`,
+        [`scsi${index}`]: `import-from=${importFrom}`,
+      };
+
       const result = await firstValueFrom(
-        this.httpService.get(
-          `${this.connection.getUri()}/nodes/${node}/storage`,
+        this.httpService.post(
+          `${this.connection.getUri()}/nodes/${node}/qemu/${vmid}/config`,
+          body,
           {
             headers: {
               'Content-Type': 'application/json',
@@ -33,13 +44,11 @@ export class GetStoragesFromNodeService {
         ),
       );
 
-      if (!result.data.length) {
-        throw new HttpException('Storages Not Found', 404);
+      if (!result.data) {
+        throw new Error('Error in config VM');
       }
 
-      const storages = result.data.map(this.toResponse);
-
-      return new StoragesResponse(storages);
+      return result.data;
     } catch (error) {
       if (error.response.status === 401) {
         throw new AuthFailedException();
@@ -50,20 +59,5 @@ export class GetStoragesFromNodeService {
     }
 
     return null;
-  }
-
-  private toResponse(result: any): StorageResponse {
-    return new StorageResponse(
-      result['type'] || '',
-      result['used'] || 0,
-      result['avail'] || 0,
-      result['total'] || 0,
-      result['enabled'] === 1,
-      result['storage'] || '',
-      result['used_fraction'] || 0.0,
-      result['content'] ? result['content'].split(',') : [],
-      result['active'] === 1,
-      result['shared'] === 1,
-    );
   }
 }

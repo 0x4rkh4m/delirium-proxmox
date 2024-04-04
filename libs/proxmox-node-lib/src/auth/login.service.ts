@@ -1,9 +1,11 @@
-import { Injectable, HttpException, UseInterceptors } from '@nestjs/common';
+import { Injectable, UseInterceptors } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
 import { LoginResponse } from '@delirium/proxmox-node-lib/auth/dto/login-response.dto';
 import { CookieInterceptor } from '@delirium/proxmox-node-lib/common/interceptor/cookie.interceptor';
+import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
+import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
 
 @Injectable()
 @UseInterceptors(CookieInterceptor)
@@ -39,10 +41,10 @@ export class LoginService {
       );
     } catch (error) {
       if (error.response.status === 401) {
-        throw new HttpException('Unauthorized', 401);
+        throw new AuthFailedException();
       }
       if (error.response.status === 0) {
-        throw new HttpException('Host Unreachable', 500);
+        throw new HostUnreachableException();
       }
     }
 

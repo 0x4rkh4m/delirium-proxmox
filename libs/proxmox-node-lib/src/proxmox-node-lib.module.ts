@@ -6,10 +6,11 @@ import { StorageModule } from './storage/storage.module';
 import { NetworkModule } from './network/network.module';
 import { VmModule } from './vm/vm.module';
 import { CpuModule } from './cpu/cpu.module';
+import { VersionModule } from './version/version.module';
 
 @Module({
   providers: [ProxmoxNodeLibService],
   exports: [ProxmoxNodeLibService],
-  imports: [AuthModule, NodeModule, StorageModule, NetworkModule, VmModule, CpuModule],
+  imports: [AuthModule, NodeModule, StorageModule, NetworkModule, VmModule, CpuModule, VersionModule],
 })
 export class ProxmoxNodeLibModule {}
