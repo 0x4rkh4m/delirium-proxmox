@@ -1,4 +1,4 @@
-import { StorageResponse } from '@delirium/proxmox-node-lib/storage/dto/storage-response.dto';
+import { StorageResponse } from './storage-response.dto';
 
 export class StoragesResponse {
   constructor(private storages: StorageResponse[]) {}

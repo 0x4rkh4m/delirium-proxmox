@@ -1,4 +1,4 @@
-import { VmResponse } from '@delirium/proxmox-node-lib/vm/dto/vm-response.dto';
+import { VmResponse } from './vm-response.dto';
 
 export class VmsResponse {
   constructor(private vms: VmResponse[]) {}

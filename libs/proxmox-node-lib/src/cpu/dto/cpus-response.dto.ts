@@ -1,4 +1,4 @@
-import { CpuResponse } from '@delirium/proxmox-node-lib/cpu/dto/cpu-response.dto';
+import { CpuResponse } from './cpu-response.dto';
 
 export class CpusResponse {
   constructor(private cpus: CpuResponse[]) {}

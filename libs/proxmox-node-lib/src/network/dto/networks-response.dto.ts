@@ -1,4 +1,4 @@
-import { NetworkResponse } from '@delirium/proxmox-node-lib/network/dto/network-response.dto';
+import { NetworkResponse } from './network-response.dto';
 
 export class NetworksResponse {
   constructor(private networks: NetworkResponse[]) {}

@@ -1,18 +1,18 @@
 import { HttpService } from '@nestjs/axios';
-import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
-import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
-import { NetModel } from '@delirium/proxmox-node-lib/vm/model/net.model';
-import { ScsiModel } from '@delirium/proxmox-node-lib/vm/model/scsi.model';
-import { IdeModel } from '@delirium/proxmox-node-lib/vm/model/ide.model';
-import { IpModel } from '@delirium/proxmox-node-lib/vm/model/ip.model';
-import { UserModel } from '@delirium/proxmox-node-lib/vm/model/user.model';
-import { CpuModel } from '@delirium/proxmox-node-lib/vm/model/cpu.model';
-import { VmsResponse } from '@delirium/proxmox-node-lib/vm/dto/vms-response.dto';
+import { Connection } from '../common/model/connection.model';
+import { CookiesPVE } from '../common/model/cookie-pve.model';
+import { NetModel } from './model/net.model';
+import { ScsiModel } from './model/scsi.model';
+import { IdeModel } from './model/ide.model';
+import { IpModel } from './model/ip.model';
+import { UserModel } from './model/user.model';
+import { CpuModel } from './model/cpu.model';
+import { VmsResponse } from './dto/vms-response.dto';
 import { firstValueFrom } from 'rxjs';
-import { CreateVMException } from '@delirium/proxmox-node-lib/vm/exception/vm-error-create.exception';
-import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
-import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
-import { VmResponse } from '@delirium/proxmox-node-lib/vm/dto/vm-response.dto';
+import { CreateVMException } from './exception/vm-error-create.exception';
+import { AuthFailedException } from '../common/exception/auth-failed.exception';
+import { HostUnreachableException } from '../common/exception/host-unreachable.exception';
+import { VmResponse } from './dto/vm-response.dto';
 
 export class CreateVMinNodeService {
   constructor(

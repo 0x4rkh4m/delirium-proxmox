@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
-import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
-import { NetworksResponse } from '@delirium/proxmox-node-lib/network/dto/networks-response.dto';
+import { Connection } from '../common/model/connection.model';
+import { CookiesPVE } from '../common/model/cookie-pve.model';
+import { NetworksResponse } from './dto/networks-response.dto';
 import { firstValueFrom } from 'rxjs';
-import { NetworksNotFoundException } from '@delirium/proxmox-node-lib/network/exception/network-not-found.exception';
-import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
-import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
-import { NetworkResponse } from '@delirium/proxmox-node-lib/network/dto/network-response.dto';
+import { NetworksNotFoundException } from './exception/network-not-found.exception';
+import { AuthFailedException } from '../common/exception/auth-failed.exception';
+import { HostUnreachableException } from '../common/exception/host-unreachable.exception';
+import { NetworkResponse } from './dto/network-response.dto';
 
 @Injectable()
 export class GetNetworksFromNodeService {

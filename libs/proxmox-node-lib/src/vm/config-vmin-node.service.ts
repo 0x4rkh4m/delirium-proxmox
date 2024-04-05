@@ -1,10 +1,10 @@
 import { HttpService } from '@nestjs/axios';
-import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
-import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
+import { Connection } from '../common/model/connection.model';
+import { CookiesPVE } from '../common/model/cookie-pve.model';
 import { firstValueFrom } from 'rxjs';
-import { ConfigVMException } from '@delirium/proxmox-node-lib/vm/exception/vm-error-config.exception';
-import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
-import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
+import { ConfigVMException } from './exception/vm-error-config.exception';
+import { AuthFailedException } from '../common/exception/auth-failed.exception';
+import { HostUnreachableException } from '../common/exception/host-unreachable.exception';
 
 export class ConfigVMinNodeService {
   constructor(
