@@ -7,6 +7,7 @@ import { StoragesResponse } from '@delirium/proxmox-node-lib/storage/dto/storage
 import { StorageResponse } from '@delirium/proxmox-node-lib/storage/dto/storage-response.dto';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
+import { StoragesNotFoundException } from '@delirium/proxmox-node-lib/storage/exception/storages-not-found.exception';
 
 @Injectable()
 export class GetStoragesFromNodeService {
@@ -34,7 +35,7 @@ export class GetStoragesFromNodeService {
       );
 
       if (!result.data.length) {
-        throw new HttpException('Storages Not Found', 404);
+        throw new StoragesNotFoundException();
       }
 
       const storages = result.data.map(this.toResponse);

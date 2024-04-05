@@ -35,7 +35,8 @@ export class ScsiModel {
     if (this.getMain()) this.text += 'file=main:' + this.getMain();
     if (this.getDiscard()) this.text += ',discard=' + this.getDiscard();
     if (this.getCache()) this.text += ',cache=' + this.getCache();
-    if (this.getImportFrom()) this.text += ',import-from=' + this.getImportFrom();
+    if (this.getImportFrom())
+      this.text += ',import-from=' + this.getImportFrom();
     return this.text;
   }
 }

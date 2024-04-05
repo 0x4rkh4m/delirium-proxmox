@@ -1,4 +1,3 @@
-import { HttpService } from '@nestjs/axios';
 import { Injectable } from '@nestjs/common';
 import { Connection } from './common/model/connection.model';
 import { CookiesPVE } from './common/model/cookie-pve.model';
@@ -11,15 +10,32 @@ import { CreateVMinNodeService } from './vm/create-vmin-node.service';
 import { ConfigVMinNodeService } from './vm/config-vmin-node.service';
 import { ResizeVMDiskService } from './vm/resize-vm-disk.service';
 import { GetVersionFromNodeService } from './version/get-version-from-node.service';
-import { AuthFailedException, HostUnreachableException } from './exceptions';
+import { AuthFailedException } from './common/exception/auth-failed.exception';
+import { HostUnreachableException } from './common/exception/host-unreachable.exception';
+import { NetModel } from './vm/model/net.model';
+import { ScsiModel } from './vm/model/scsi.model';
+import { IdeModel } from './vm/model/ide.model';
+import { IpModel } from './vm/model/ip.model';
+import { UserModel } from './vm/model/user.model';
+import { CpuModel } from './vm/model/cpu.model';
+import { VmsResponse } from './vm/dto/vms-response.dto';
+import { LoginResponse } from './auth/dto/login-response.dto';
+import { StoragesResponse } from './storage/dto/storages-response.dto';
+import { NodesResponse } from './node/dto/nodes-response.dto';
+import { NetworksResponse } from './network/dto/networks-response.dto';
+import { CpusResponse } from './cpu/dto/cpus-response.dto';
+import { VersionResponse } from './version/dto/version-response.dto';
+import { StoragesNotFoundException } from '@delirium/proxmox-node-lib/storage/exception/storages-not-found.exception';
+import { NetworksNotFoundException } from '@delirium/proxmox-node-lib/network/exception/network-not-found.exception';
+import { CpusNotFoundException } from '@delirium/proxmox-node-lib/cpu/exception/cpu-not-found.exception';
+import { VersionNotFoundException } from '@delirium/proxmox-node-lib/version/exception/version-not-found.exception';
 
 @Injectable()
-export class ProxmoxService {
+export class DeliriumClient {
   private connection: Connection;
   private cookiesPVE: CookiesPVE;
 
   constructor(
-    private httpService: HttpService,
     private loginService: LoginService,
     private getNodesService: GetNodesService,
     private getStoragesFromNodeService: GetStoragesFromNodeService,
@@ -37,7 +53,7 @@ export class ProxmoxService {
     password: string,
     realm: string,
     port = 8006,
-  ): Promise<void> {
+  ): Promise<LoginResponse | AuthFailedException | HostUnreachableException> {
     this.connection = new Connection(hostname, port, username, password, realm);
     const result = await this.loginService.login(this.connection);
     if (!result) {
@@ -51,90 +67,107 @@ export class ProxmoxService {
     return result;
   }
 
-  async getNodes(): Promise<any> {
+  async getNodes(): Promise<
+    NodesResponse | AuthFailedException | HostUnreachableException
+  > {
     try {
-      return this.getNodesService.getNodes(this.connection, this.cookiesPVE);
+      return await this.getNodesService.getNodes();
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
       }
-      if (error.response.status === 0) {
-        throw new HostUnreachableException();
-      }
+      throw new HostUnreachableException();
     }
   }
 
-  async getStoragesFromNode(node: string): Promise<any> {
+  async getStoragesFromNode(
+    node: string,
+  ): Promise<
+    | StoragesResponse
+    | AuthFailedException
+    | HostUnreachableException
+    | StoragesNotFoundException
+  > {
     try {
-      return this.getStoragesFromNodeService.getStoragesFromNode(
-        node,
-        this.connection,
-        this.cookiesPVE,
-      );
+      return await this.getStoragesFromNodeService.getStorages(node);
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
       }
-      if (error.response.status === 0) {
+      if (error instanceof HostUnreachableException) {
         throw new HostUnreachableException();
       }
+      throw new StoragesNotFoundException();
     }
   }
 
-  async getNetworksFromNode(node: string): Promise<any> {
+  async getNetworksFromNode(
+    node: string,
+  ): Promise<
+    | NetworksResponse
+    | AuthFailedException
+    | HostUnreachableException
+    | NetworksNotFoundException
+  > {
     try {
-      return this.getNetworksFromNodeService.getNetworksFromNode(
-        node,
-        this.connection,
-        this.cookiesPVE,
-      );
+      return await this.getNetworksFromNodeService.getNetworks(node);
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
       }
-      if (error.response.status === 0) {
+      if (error instanceof HostUnreachableException) {
         throw new HostUnreachableException();
       }
+      throw new NetworksNotFoundException();
     }
   }
 
-  async getCpusFromNode(node: string): Promise<any> {
+  async getCpuFromNode(
+    node: string,
+  ): Promise<
+    | CpusResponse
+    | AuthFailedException
+    | HostUnreachableException
+    | CpusNotFoundException
+  > {
     try {
-      return this.getCpuFromNodeService.getCpusFromNode(
-        node,
-        this.connection,
-        this.cookiesPVE,
-      );
+      return await this.getCpuFromNodeService.getCpu(node);
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
       }
-      if (error.response.status === 0) {
+      if (error instanceof HostUnreachableException) {
         throw new HostUnreachableException();
       }
+      throw new CpusNotFoundException();
     }
   }
 
   async createVM(
     node: string,
     vmid: number,
-    cores?: number,
-    name?: string,
-    net?: NetModel,
-    onBoot?: boolean,
-    scsihw?: string,
-    scsi?: ScsiModel,
-    tags?: string,
-    ide?: IdeModel,
-    boot?: string,
-    bootDisk?: string,
-    agent?: string,
-    ip?: IpModel,
-    userModel?: UserModel,
-    cpuModel?: CpuModel,
-  ): Promise<VmsResponse | null> {
+    cores: number,
+    name: string,
+    net: NetModel,
+    onBoot: boolean,
+    scsihw: string,
+    scsi: ScsiModel,
+    tags: string,
+    ide: IdeModel,
+    boot: string,
+    bootDisk: string,
+    agent: string,
+    ip: IpModel,
+    user: UserModel,
+    cpu: CpuModel,
+  ): Promise<
+    | VmsResponse
+    | AuthFailedException
+    | HostUnreachableException
+    | VmErrorCreateException
+  > {
     try {
-      return this.createVMinNodeService.createVM(
+      return await this.createVMinNodeService.createVM(
         node,
         vmid,
         cores,
@@ -149,88 +182,93 @@ export class ProxmoxService {
         bootDisk,
         agent,
         ip,
-        userModel,
-        cpuModel,
-        this.connection,
-        this.cookiesPVE,
+        user,
+        cpu,
       );
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
       }
-      if (error.response.status === 0) {
+      if (error instanceof HostUnreachableException) {
         throw new HostUnreachableException();
       }
+      throw new VmErrorCreateException();
     }
   }
 
   async configVM(
     node: string,
     vmid: number,
-    index?: number,
-    discard?: string,
-    cache?: string,
-    importFrom?: string,
-  ): Promise<string | null> {
+    index: number,
+    discard: string,
+    cache: string,
+    importFrom: string,
+  ): Promise<
+    | string
+    | AuthFailedException
+    | HostUnreachableException
+    | ResizeVMDiskException
+  > {
     try {
-      return this.configVMinNodeService.configVM(
+      return await this.configVMinNodeService.configVM(
         node,
         vmid,
         index,
         discard,
         cache,
         importFrom,
-        this.connection,
-        this.cookiesPVE,
       );
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
       }
-      if (error.response.status === 0) {
+      if (error instanceof HostUnreachableException) {
         throw new HostUnreachableException();
       }
+      throw new ResizeVMDiskException();
     }
   }
 
-  async resizeVMDisk(
+  async resizeDisk(
     node: string,
     vmid: number,
-    disk?: string,
-    size?: string,
-  ): Promise<string | null> {
+    disk: string,
+    size: string,
+  ): Promise<
+    | string
+    | AuthFailedException
+    | HostUnreachableException
+    | ResizeVMDiskException
+  > {
     try {
-      return this.resizeVMDiskService.resizeVMDisk(
-        node,
-        vmid,
-        disk,
-        size,
-        this.connection,
-        this.cookiesPVE,
-      );
+      return await this.resizeVMDiskService.resizeDisk(node, vmid, disk, size);
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
       }
-      if (error.response.status === 0) {
+      if (error instanceof HostUnreachableException) {
         throw new HostUnreachableException();
       }
+      throw new ResizeVMDiskException();
     }
   }
 
-  async getVersion(): Promise<any> {
+  async getVersion(): Promise<
+    | VersionResponse
+    | AuthFailedException
+    | HostUnreachableException
+    | VersionNotFoundException
+  > {
     try {
-      return this.getVersionFromNodeService.getVersion(
-        this.connection,
-        this.cookiesPVE,
-      );
+      return await this.getVersionFromNodeService.getVersion();
     } catch (error) {
-      if (error.response.status === 401) {
+      if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
       }
-      if (error.response.status === 0) {
+      if (error instanceof HostUnreachableException) {
         throw new HostUnreachableException();
       }
+      throw new VersionNotFoundException();
     }
   }
 }

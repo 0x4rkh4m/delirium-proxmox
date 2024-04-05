@@ -6,7 +6,10 @@ import { CpusResponse } from '@delirium/proxmox-node-lib/cpu/dto/cpus-response.d
 import { CpuResponse } from '@delirium/proxmox-node-lib/cpu/dto/cpu-response.dto';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
+import { Injectable } from '@nestjs/common';
+import { CpusNotFoundException } from '@delirium/proxmox-node-lib/cpu/exception/cpu-not-found.exception';
 
+@Injectable()
 export class GetCpuFromNodeService {
   constructor(
     private httpService: HttpService,
@@ -32,7 +35,7 @@ export class GetCpuFromNodeService {
       );
 
       if (!result.data.length) {
-        throw new Error('CPU Not Found');
+        throw new CpusNotFoundException();
       }
 
       const cpus = result.data.map(this.toResponse);

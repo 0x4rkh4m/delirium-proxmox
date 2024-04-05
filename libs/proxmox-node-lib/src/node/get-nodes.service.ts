@@ -7,6 +7,7 @@ import { NodesResponse } from '@delirium/proxmox-node-lib/node/dto/nodes-respons
 import { NodeResponse } from '@delirium/proxmox-node-lib/node/dto/node-response.dto';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
+import { NodesNotFoundException } from '@delirium/proxmox-node-lib/node/exception/nodes-not-found.exception';
 
 @Injectable()
 export class GetNodesService {
@@ -29,6 +30,10 @@ export class GetNodesService {
           },
         }),
       );
+
+      if (!result.data.length) {
+        throw new NodesNotFoundException();
+      }
 
       const nodes = result.data.map(this.toResponse);
 

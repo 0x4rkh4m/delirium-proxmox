@@ -5,6 +5,7 @@ import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.m
 import { VersionResponse } from '@delirium/proxmox-node-lib/version/dto/version-response.dto';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
+import { VersionNotFoundException } from '@delirium/proxmox-node-lib/version/exception/version-not-found.exception';
 
 export class GetVersionFromNodeService {
   constructor(
@@ -28,7 +29,7 @@ export class GetVersionFromNodeService {
       );
 
       if (!result.data) {
-        throw new Error('Version Not Found');
+        throw new VersionNotFoundException();
       }
 
       return this.toResponse(result.data);

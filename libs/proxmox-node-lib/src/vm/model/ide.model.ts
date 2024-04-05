@@ -1,5 +1,8 @@
 export class IdeModel {
-  constructor(private index: number, private file: string) {}
+  constructor(
+    private index: number,
+    private file: string,
+  ) {}
 
   getIndex(): number {
     return this.index;

@@ -11,6 +11,14 @@ import { VersionModule } from './version/version.module';
 @Module({
   providers: [ProxmoxNodeLibService],
   exports: [ProxmoxNodeLibService],
-  imports: [AuthModule, NodeModule, StorageModule, NetworkModule, VmModule, CpuModule, VersionModule],
+  imports: [
+    AuthModule,
+    NodeModule,
+    StorageModule,
+    NetworkModule,
+    VmModule,
+    CpuModule,
+    VersionModule,
+  ],
 })
 export class ProxmoxNodeLibModule {}

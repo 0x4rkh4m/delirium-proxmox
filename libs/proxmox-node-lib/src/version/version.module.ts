@@ -1,7 +1,7 @@
 import { Module } from '@nestjs/common';
-import { GetVersionFromProxmoxService } from './get-version-from-node.service';
+import { GetVersionFromNodeService } from './get-version-from-node.service';
 
 @Module({
-  providers: [GetVersionFromProxmoxService]
+  providers: [GetVersionFromNodeService],
 })
 export class VersionModule {}

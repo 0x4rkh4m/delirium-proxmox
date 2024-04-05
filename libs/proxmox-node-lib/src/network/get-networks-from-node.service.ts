@@ -1,4 +1,3 @@
-import { Injectable, HttpException } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
 import { firstValueFrom } from 'rxjs';
 import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
@@ -7,6 +6,8 @@ import { NetworkResponse } from '@delirium/proxmox-node-lib/network/dto/network-
 import { NetworksResponse } from '@delirium/proxmox-node-lib/network/dto/networks-response.dto';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
+import { Injectable } from '@nestjs/common';
+import { NetworksNotFoundException } from '@delirium/proxmox-node-lib/network/exception/network-not-found.exception';
 
 @Injectable()
 export class GetNetworksFromNodeService {
@@ -34,7 +35,7 @@ export class GetNetworksFromNodeService {
       );
 
       if (!result.data.length) {
-        throw new HttpException('Networks Not Found', 404);
+        throw new NetworksNotFoundException();
       }
 
       const networks = result.data.map(this.toResponse);
