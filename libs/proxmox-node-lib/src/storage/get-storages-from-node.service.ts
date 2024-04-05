@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
-import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
-import { StoragesResponse } from '@delirium/proxmox-node-lib/storage/dto/storages-response.dto';
+import { Connection } from '../common/model/connection.model';
+import { CookiesPVE } from '../common/model/cookie-pve.model';
+import { StoragesResponse } from './dto/storages-response.dto';
 import { firstValueFrom } from 'rxjs';
-import { StoragesNotFoundException } from '@delirium/proxmox-node-lib/storage/exception/storages-not-found.exception';
-import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
-import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
-import { StorageResponse } from '@delirium/proxmox-node-lib/storage/dto/storage-response.dto';
+import { StoragesNotFoundException } from './exception/storages-not-found.exception';
+import { AuthFailedException } from '../common/exception/auth-failed.exception';
+import { HostUnreachableException } from '../common/exception/host-unreachable.exception';
+import { StorageResponse } from './dto/storage-response.dto';
 
 @Injectable()
 export class GetStoragesFromNodeService {
