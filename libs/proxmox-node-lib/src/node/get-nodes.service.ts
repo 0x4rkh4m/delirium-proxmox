@@ -1,13 +1,13 @@
 import { Injectable } from '@nestjs/common';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
 import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
 import { NodesResponse } from '@delirium/proxmox-node-lib/node/dto/nodes-response.dto';
-import { NodeResponse } from '@delirium/proxmox-node-lib/node/dto/node-response.dto';
+import { firstValueFrom } from 'rxjs';
+import { NodesNotFoundException } from '@delirium/proxmox-node-lib/node/exception/nodes-not-found.exception';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
-import { NodesNotFoundException } from '@delirium/proxmox-node-lib/node/exception/nodes-not-found.exception';
+import { NodeResponse } from '@delirium/proxmox-node-lib/node/dto/node-response.dto';
 
 @Injectable()
 export class GetNodesService {

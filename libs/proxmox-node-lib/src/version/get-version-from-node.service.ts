@@ -1,11 +1,11 @@
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
 import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
 import { VersionResponse } from '@delirium/proxmox-node-lib/version/dto/version-response.dto';
+import { firstValueFrom } from 'rxjs';
+import { VersionNotFoundException } from '@delirium/proxmox-node-lib/version/exception/version-not-found.exception';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
-import { VersionNotFoundException } from '@delirium/proxmox-node-lib/version/exception/version-not-found.exception';
 
 export class GetVersionFromNodeService {
   constructor(

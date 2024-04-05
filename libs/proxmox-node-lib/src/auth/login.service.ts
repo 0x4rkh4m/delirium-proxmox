@@ -1,9 +1,9 @@
 import { Injectable, UseInterceptors } from '@nestjs/common';
+import { CookieInterceptor } from '@delirium/proxmox-node-lib/common/interceptor/cookie.interceptor';
 import { HttpService } from '@nestjs/axios';
-import { firstValueFrom } from 'rxjs';
 import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.model';
 import { LoginResponse } from '@delirium/proxmox-node-lib/auth/dto/login-response.dto';
-import { CookieInterceptor } from '@delirium/proxmox-node-lib/common/interceptor/cookie.interceptor';
+import { firstValueFrom } from 'rxjs';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
 
