@@ -1,6 +1,6 @@
 {
   "name": "delirium-proxmox",
-  "version": "1.1.1",
+  "version": "1.1.2",
   "description": "A Node.js library for interacting with the Proxmox API. It provides a simple and lightweight wrapper around the Proxmox API, making it easier to manage your Proxmox virtual environments from a Node.js application.",
   "main": "dist/index.js",
   "repository": {
