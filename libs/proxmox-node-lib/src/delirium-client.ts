@@ -25,45 +25,90 @@ import { NodesResponse } from './node/dto/nodes-response.dto';
 import { NetworksResponse } from './network/dto/networks-response.dto';
 import { CpusResponse } from './cpu/dto/cpus-response.dto';
 import { VersionResponse } from './version/dto/version-response.dto';
-import { StoragesNotFoundException } from '@delirium/proxmox-node-lib/storage/exception/storages-not-found.exception';
-import { NetworksNotFoundException } from '@delirium/proxmox-node-lib/network/exception/network-not-found.exception';
-import { CpusNotFoundException } from '@delirium/proxmox-node-lib/cpu/exception/cpu-not-found.exception';
-import { VersionNotFoundException } from '@delirium/proxmox-node-lib/version/exception/version-not-found.exception';
-import { CreateVMException } from '@delirium/proxmox-node-lib/vm/exception/vm-error-create.exception';
-import { ResizeVMDiskException } from '@delirium/proxmox-node-lib/vm/exception/resize-vm-disk.exception';
-import { ConfigVMException } from '@delirium/proxmox-node-lib/vm/exception/vm-error-config.exception';
+import { StoragesNotFoundException } from './storage/exception/storages-not-found.exception';
+import { NetworksNotFoundException } from './network/exception/network-not-found.exception';
+import { CpusNotFoundException } from './cpu/exception/cpu-not-found.exception';
+import { VersionNotFoundException } from './version/exception/version-not-found.exception';
+import { CreateVMException } from './vm/exception/vm-error-create.exception';
+import { ResizeVMDiskException } from './vm/exception/resize-vm-disk.exception';
+import { ConfigVMException } from './vm/exception/vm-error-config.exception';
+import { HttpService } from '@nestjs/axios';
 
 @Injectable()
 export class DeliriumClient {
   private connection: Connection;
   private cookiesPVE: CookiesPVE;
+  private httpService: HttpService;
+  private loginService: LoginService;
+  private getNodesService: GetNodesService;
+  private getStoragesFromNodeService: GetStoragesFromNodeService;
+  private getNetworksFromNodeService: GetNetworksFromNodeService;
+  private getCpuFromNodeService: GetCpuFromNodeService;
+  private createVMinNodeService: CreateVMinNodeService;
+  private configVMinNodeService: ConfigVMinNodeService;
+  private resizeVMDiskService: ResizeVMDiskService;
+  private getVersionFromNodeService: GetVersionFromNodeService;
 
   constructor(
-    private loginService: LoginService,
-    private getNodesService: GetNodesService,
-    private getStoragesFromNodeService: GetStoragesFromNodeService,
-    private getNetworksFromNodeService: GetNetworksFromNodeService,
-    private getCpuFromNodeService: GetCpuFromNodeService,
-    private createVMinNodeService: CreateVMinNodeService,
-    private configVMinNodeService: ConfigVMinNodeService,
-    private resizeVMDiskService: ResizeVMDiskService,
-    private getVersionFromNodeService: GetVersionFromNodeService,
-  ) {}
-
-  async login(
     hostname: string,
     username: string,
     password: string,
     realm: string,
     port = 8006,
-  ): Promise<LoginResponse | AuthFailedException | HostUnreachableException> {
+  ) {
     this.connection = new Connection(hostname, port, username, password, realm);
-    const result = await this.loginService.login(this.connection);
-    if (!result) {
-      throw new AuthFailedException();
-    }
+    this.httpService = new HttpService();
+    this.loginService = new LoginService(this.httpService);
+    this.getNodesService = new GetNodesService(
+      this.httpService,
+      this.connection,
+      this.cookiesPVE,
+    );
+    this.getStoragesFromNodeService = new GetStoragesFromNodeService(
+      this.httpService,
+      this.connection,
+      this.cookiesPVE,
+    );
+    this.getNetworksFromNodeService = new GetNetworksFromNodeService(
+      this.httpService,
+      this.connection,
+      this.cookiesPVE,
+    );
+    this.getCpuFromNodeService = new GetCpuFromNodeService(
+      this.httpService,
+      this.connection,
+      this.cookiesPVE,
+    );
+    this.createVMinNodeService = new CreateVMinNodeService(
+      this.httpService,
+      this.connection,
+      this.cookiesPVE,
+    );
+    this.configVMinNodeService = new ConfigVMinNodeService(
+      this.httpService,
+      this.connection,
+      this.cookiesPVE,
+    );
+    this.resizeVMDiskService = new ResizeVMDiskService(
+      this.httpService,
+      this.connection,
+      this.cookiesPVE,
+    );
+    this.getVersionFromNodeService = new GetVersionFromNodeService(
+      this.httpService,
+      this.connection,
+      this.cookiesPVE,
+    );
+  }
 
+  async login(): Promise<
+    LoginResponse | AuthFailedException | HostUnreachableException
+  > {
     try {
+      const result = await this.loginService.login(this.connection);
+      if (!result) {
+        throw new AuthFailedException();
+      }
       this.cookiesPVE = new CookiesPVE(
         result.getCSRFPreventionToken(),
         result.getCookies(),
@@ -74,7 +119,9 @@ export class DeliriumClient {
       if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
       }
-      throw new HostUnreachableException();
+      if (error instanceof HostUnreachableException) {
+        throw new HostUnreachableException();
+      }
     }
   }
 
@@ -82,12 +129,18 @@ export class DeliriumClient {
     NodesResponse | AuthFailedException | HostUnreachableException
   > {
     try {
-      return await this.getNodesService.getNodes();
+      const result = await this.getNodesService.getNodes();
+      if (!result) {
+        throw new AuthFailedException();
+      }
+      return result;
     } catch (error) {
       if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
       }
-      throw new HostUnreachableException();
+      if (error instanceof HostUnreachableException) {
+        throw new HostUnreachableException();
+      }
     }
   }
 
@@ -100,7 +153,11 @@ export class DeliriumClient {
     | StoragesNotFoundException
   > {
     try {
-      return await this.getStoragesFromNodeService.getStorages(node);
+      const result = await this.getStoragesFromNodeService.getStorages(node);
+      if (!result) {
+        throw new AuthFailedException();
+      }
+      return result;
     } catch (error) {
       if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
@@ -121,7 +178,11 @@ export class DeliriumClient {
     | NetworksNotFoundException
   > {
     try {
-      return await this.getNetworksFromNodeService.getNetworks(node);
+      const result = await this.getNetworksFromNodeService.getNetworks(node);
+      if (!result) {
+        throw new AuthFailedException();
+      }
+      return result;
     } catch (error) {
       if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
@@ -142,7 +203,11 @@ export class DeliriumClient {
     | CpusNotFoundException
   > {
     try {
-      return await this.getCpuFromNodeService.getCpu(node);
+      const result = await this.getCpuFromNodeService.getCpu(node);
+      if (!result) {
+        throw new AuthFailedException();
+      }
+      return result;
     } catch (error) {
       if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
@@ -178,7 +243,7 @@ export class DeliriumClient {
     | CreateVMException
   > {
     try {
-      return await this.createVMinNodeService.createVM(
+      const result = await this.createVMinNodeService.createVM(
         node,
         vmid,
         cores,
@@ -196,6 +261,10 @@ export class DeliriumClient {
         user,
         cpu,
       );
+      if (!result) {
+        throw new AuthFailedException();
+      }
+      return result;
     } catch (error) {
       if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
@@ -218,7 +287,7 @@ export class DeliriumClient {
     string | AuthFailedException | HostUnreachableException | ConfigVMException
   > {
     try {
-      return await this.configVMinNodeService.configVM(
+      const result = await this.configVMinNodeService.configVM(
         node,
         vmid,
         index,
@@ -226,6 +295,10 @@ export class DeliriumClient {
         cache,
         importFrom,
       );
+      if (!result) {
+        throw new AuthFailedException();
+      }
+      return result;
     } catch (error) {
       if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
@@ -249,7 +322,16 @@ export class DeliriumClient {
     | ResizeVMDiskException
   > {
     try {
-      return await this.resizeVMDiskService.resizeDisk(node, vmid, disk, size);
+      const result = await this.resizeVMDiskService.resizeDisk(
+        node,
+        vmid,
+        disk,
+        size,
+      );
+      if (!result) {
+        throw new AuthFailedException();
+      }
+      return result;
     } catch (error) {
       if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
@@ -268,7 +350,11 @@ export class DeliriumClient {
     | VersionNotFoundException
   > {
     try {
-      return await this.getVersionFromNodeService.getVersion();
+      const result = await this.getVersionFromNodeService.getVersion();
+      if (!result) {
+        throw new AuthFailedException();
+      }
+      return result;
     } catch (error) {
       if (error instanceof AuthFailedException) {
         throw new AuthFailedException();
