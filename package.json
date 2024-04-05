@@ -7,6 +7,7 @@
   "license": "UNLICENSED",
   "scripts": {
     "build": "nest build",
+    "build:lib": "rimraf dist && tsc -p ./libs/proxmox-node-lib/tsconfig.lib.json && sh copy-libraries-files.sh",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",
@@ -26,6 +27,7 @@
     "@nestjs/platform-express": "^10.0.0",
     "axios": "^1.6.8",
     "reflect-metadata": "^0.1.13",
+    "rimraf": "^5.0.5",
     "rxjs": "^7.8.1",
     "tough-cookie": "^4.1.3"
   },
