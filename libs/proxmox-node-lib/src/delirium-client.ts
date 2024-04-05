@@ -29,6 +29,9 @@ import { StoragesNotFoundException } from '@delirium/proxmox-node-lib/storage/ex
 import { NetworksNotFoundException } from '@delirium/proxmox-node-lib/network/exception/network-not-found.exception';
 import { CpusNotFoundException } from '@delirium/proxmox-node-lib/cpu/exception/cpu-not-found.exception';
 import { VersionNotFoundException } from '@delirium/proxmox-node-lib/version/exception/version-not-found.exception';
+import { CreateVMException } from '@delirium/proxmox-node-lib/vm/exception/vm-error-create.exception';
+import { ResizeVMDiskException } from '@delirium/proxmox-node-lib/vm/exception/resize-vm-disk.exception';
+import { ConfigVMException } from '@delirium/proxmox-node-lib/vm/exception/vm-error-config.exception';
 
 @Injectable()
 export class DeliriumClient {
@@ -59,12 +62,20 @@ export class DeliriumClient {
     if (!result) {
       throw new AuthFailedException();
     }
-    this.cookiesPVE = new CookiesPVE(
-      result.getCSRFPreventionToken(),
-      result.getCookies(),
-      result.getTicket(),
-    );
-    return result;
+
+    try {
+      this.cookiesPVE = new CookiesPVE(
+        result.getCSRFPreventionToken(),
+        result.getCookies(),
+        result.getTicket(),
+      );
+      return result;
+    } catch (error) {
+      if (error instanceof AuthFailedException) {
+        throw new AuthFailedException();
+      }
+      throw new HostUnreachableException();
+    }
   }
 
   async getNodes(): Promise<
@@ -164,7 +175,7 @@ export class DeliriumClient {
     | VmsResponse
     | AuthFailedException
     | HostUnreachableException
-    | VmErrorCreateException
+    | CreateVMException
   > {
     try {
       return await this.createVMinNodeService.createVM(
@@ -192,7 +203,7 @@ export class DeliriumClient {
       if (error instanceof HostUnreachableException) {
         throw new HostUnreachableException();
       }
-      throw new VmErrorCreateException();
+      throw new CreateVMException();
     }
   }
 
@@ -204,10 +215,7 @@ export class DeliriumClient {
     cache?: string,
     importFrom?: string,
   ): Promise<
-    | string
-    | AuthFailedException
-    | HostUnreachableException
-    | ResizeVMDiskException
+    string | AuthFailedException | HostUnreachableException | ConfigVMException
   > {
     try {
       return await this.configVMinNodeService.configVM(
@@ -225,7 +233,7 @@ export class DeliriumClient {
       if (error instanceof HostUnreachableException) {
         throw new HostUnreachableException();
       }
-      throw new ResizeVMDiskException();
+      throw new ConfigVMException();
     }
   }
 

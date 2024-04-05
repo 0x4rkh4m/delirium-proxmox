@@ -4,6 +4,7 @@ import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.m
 import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
+import { ResizeVMDiskException } from '@delirium/proxmox-node-lib/vm/exception/resize-vm-disk.exception';
 
 export class ResizeVMDiskService {
   constructor(
@@ -41,7 +42,7 @@ export class ResizeVMDiskService {
       );
 
       if (!result.data) {
-        throw new Error('Error in resize VM disk');
+        throw new ResizeVMDiskException();
       }
 
       return result.data;

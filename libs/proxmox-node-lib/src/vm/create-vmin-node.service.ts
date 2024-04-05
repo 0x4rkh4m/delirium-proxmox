@@ -12,6 +12,7 @@ import { CpuModel } from '@delirium/proxmox-node-lib/vm/model/cpu.model';
 import { VmResponse } from '@delirium/proxmox-node-lib/vm/dto/vm-response.dto';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
+import { CreateVMException } from '@delirium/proxmox-node-lib/vm/exception/vm-error-create.exception';
 
 export class CreateVMinNodeService {
   constructor(
@@ -77,7 +78,7 @@ export class CreateVMinNodeService {
       );
 
       if (!result.data) {
-        throw new Error('Error in create VM');
+        throw new CreateVMException();
       }
 
       const vms = result.data.map(this.toResponse);

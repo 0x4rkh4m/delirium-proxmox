@@ -4,6 +4,7 @@ import { Connection } from '@delirium/proxmox-node-lib/common/model/connection.m
 import { CookiesPVE } from '@delirium/proxmox-node-lib/common/model/cookie-pve.model';
 import { AuthFailedException } from '@delirium/proxmox-node-lib/common/exception/auth-failed.exception';
 import { HostUnreachableException } from '@delirium/proxmox-node-lib/common/exception/host-unreachable.exception';
+import { ConfigVMException } from '@delirium/proxmox-node-lib/vm/exception/vm-error-config.exception';
 
 export class ConfigVMinNodeService {
   constructor(
@@ -45,7 +46,7 @@ export class ConfigVMinNodeService {
       );
 
       if (!result.data) {
-        throw new Error('Error in config VM');
+        throw new ConfigVMException();
       }
 
       return result.data;
