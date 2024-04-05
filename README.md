@@ -29,8 +29,8 @@ import { DeliriumClient } from 'delirium-proxmox';
 Then, create an instance of the \`ProxmoxService\` and use its methods to interact with the Proxmox API:
 
 ```typescript
-const proxmoxService = new ProxmoxService();
-// Use the service...
+const deliriumClient = new DeliriumClient();
+// Use the client...
 ```
 
 ## Peer Dependencies
