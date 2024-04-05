@@ -8,6 +8,7 @@
   "scripts": {
     "build": "nest build",
     "build:lib": "rimraf dist && tsc -p ./libs/proxmox-node-lib/tsconfig.lib.json && sh copy-libraries-files.sh",
+    "publish:lib": "cd dist/libs/proxmox-node-lib && npm publish",
     "format": "prettier --write \"src/**/*.ts\" \"test/**/*.ts\" \"libs/**/*.ts\"",
     "start": "nest start",
     "start:dev": "nest start --watch",

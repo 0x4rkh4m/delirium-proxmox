@@ -1,6 +1,6 @@
 # Delirium Proxmox Library
 
-This is a Node.js library for interacting with the Proxmox API. It provides a simple and lightweight wrapper around the Proxmox API, making it easier to manage your Proxmox virtual environments from a Node.js application.
+Node.js library for interacting with the Proxmox API. It provides a simple and lightweight wrapper around the Proxmox API, making it easier to manage your Proxmox virtual environments from a Node.js application.
 
 ## Features
 
