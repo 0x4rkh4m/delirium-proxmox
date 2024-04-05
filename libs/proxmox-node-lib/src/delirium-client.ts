@@ -146,20 +146,20 @@ export class DeliriumClient {
   async createVM(
     node: string,
     vmid: number,
-    cores: number,
-    name: string,
-    net: NetModel,
-    onBoot: boolean,
-    scsihw: string,
-    scsi: ScsiModel,
-    tags: string,
-    ide: IdeModel,
-    boot: string,
-    bootDisk: string,
-    agent: string,
-    ip: IpModel,
-    user: UserModel,
-    cpu: CpuModel,
+    cores?: number,
+    name?: string,
+    net?: NetModel,
+    onBoot?: boolean,
+    scsihw?: string,
+    scsi?: ScsiModel,
+    tags?: string,
+    ide?: IdeModel,
+    boot?: string,
+    bootDisk?: string,
+    agent?: string,
+    ip?: IpModel,
+    user?: UserModel,
+    cpu?: CpuModel,
   ): Promise<
     | VmsResponse
     | AuthFailedException
@@ -199,10 +199,10 @@ export class DeliriumClient {
   async configVM(
     node: string,
     vmid: number,
-    index: number,
-    discard: string,
-    cache: string,
-    importFrom: string,
+    index?: number,
+    discard?: string,
+    cache?: string,
+    importFrom?: string,
   ): Promise<
     | string
     | AuthFailedException
@@ -232,8 +232,8 @@ export class DeliriumClient {
   async resizeDisk(
     node: string,
     vmid: number,
-    disk: string,
-    size: string,
+    disk?: string,
+    size?: string,
   ): Promise<
     | string
     | AuthFailedException

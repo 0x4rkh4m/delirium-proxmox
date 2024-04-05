@@ -51,6 +51,7 @@ export class CreateVMinNodeService {
         [`ide${ide.getIndex()}`]: ide.getFile(),
         boot,
         bootdisk: bootDisk,
+        agent,
         ipconfig: ip.toString(),
         ciuser: userModel.getUserName(),
         cipassword: userModel.getPassword(),
