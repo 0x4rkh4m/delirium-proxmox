@@ -101,6 +101,10 @@ export class DeliriumClient {
     );
   }
 
+  isAuthenticated(): boolean {
+    return !!this.cookiesPVE;
+  }
+
   async login(): Promise<
     LoginResponse | AuthFailedException | HostUnreachableException
   > {
